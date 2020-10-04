@@ -173,6 +173,11 @@ def solveDoku(S):
         if not fullSudoku:
             print("Sudoku is valid, checking twins")
             twins=findTwins(S)
+            if len(twins)==0:
+                print("No twins found")
+                rawSudoku(S)
+                printSudoku(S)
+                print("Sudoku not completed")
             for t in twins:
                 xt=t[0]
                 yt=t[1]
@@ -182,7 +187,8 @@ def solveDoku(S):
                     tryValid,trySudoku=solveDoku(trySudoku)
                     if tryValid:
                         return True,trySudoku
-        print("Sudoku completed")
+        else:
+            print("Sudoku completed")
         return True,S
     else:
         print("Error solving sudoku")

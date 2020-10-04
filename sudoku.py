@@ -32,7 +32,6 @@ else:
 
 validSudoku,S=solveDoku(S)
 if validSudoku:
-    print("You win")
     writeSudoku('sol.txt',S)
 else:
     print("Error solving sudoku")
