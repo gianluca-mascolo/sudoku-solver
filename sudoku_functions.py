@@ -122,3 +122,23 @@ def findUnique(S,x,y):
         else:
             return originalS,False
     return originalS,False
+
+def findTwins(S):
+    twinsCoord=set()
+    gotTwins=set()
+    discardTwins=set()
+    for y in range(9):
+        for x in range(9):
+            if len(S[y][x])==2:
+                twinsCoord.add((x,y))
+    for pivotCoord in twinsCoord:
+        pivotX=pivotCoord[0]
+        pivotY=pivotCoord[1]
+        for checkCoord in twinsCoord:
+            checkX=checkCoord[0]
+            checkY=checkCoord[1]
+            if (pivotX==checkX and not pivotY==checkY) or (pivotY==checkY and not pivotX==checkX) or ((checkX != pivotX and checkY!=pivotY) and (pivotX-pivotX%3 <= checkX < pivotX+(3-pivotX%3)) and (pivotY-pivotY%3 <= checkY < pivotY+(3-pivotY%3))):
+                if S[pivotY][pivotX]==S[checkY][checkX] and (pivotX,pivotY) not in discardTwins:
+                    gotTwins.add((pivotX,pivotY))
+                    discardTwins.add((checkX,checkY))
+    return(gotTwins)

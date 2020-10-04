@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import sudoku_functions
-from sudoku_functions import printSudoku,rawSudoku,loadSudoku,writeSudoku,digSudoku,checkSudoku,findUnique
+from sudoku_functions import printSudoku,rawSudoku,loadSudoku,writeSudoku,digSudoku,checkSudoku,findUnique,findTwins
 
 
 
@@ -60,6 +60,12 @@ if validSudoku:
     else:
         print("Sudoku is valid")
         rawSudoku(S)
+        twins=findTwins(S)
+        for t in twins:
+            xt=t[0]
+            yt=t[1]
+            print(t,xt,yt,S[yt][xt])
+            
     writeSudoku('sol.txt',S)
 else:
     print("Error solving sudoku")
