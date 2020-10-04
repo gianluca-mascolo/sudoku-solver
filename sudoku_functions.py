@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import copy
 def printSudoku(S):
     print('+---+---+---+')
     for y in range(9):
@@ -142,3 +143,48 @@ def findTwins(S):
                     gotTwins.add((pivotX,pivotY))
                     discardTwins.add((checkX,checkY))
     return(gotTwins)
+
+def solveDoku(S):
+    visited=[]
+    oldProgress=-1
+    Progress=0
+    newUnique=1
+    while Progress < 81 and newUnique > 0:
+        while oldProgress < Progress:
+            oldProgress=Progress
+            for y in range(9):
+                for x in range(9):
+                    if len(S[y][x])==1 and (x,y) not in visited:
+                        S=digSudoku(S,x,y)
+                        visited.append((x,y))
+        newUnique=0
+        for y in range(9):
+            for x in range(9):
+                if len(S[y][x])>1:
+                    S,changedS=findUnique(S,x,y)
+                    if changedS:
+                        newUnique+=1
+        printSudoku(S)
+        Progress=len(visited)
+        print("Got " + str(Progress) + " numbers." + "New Unique to explore: " + str(newUnique))
+
+    validSudoku,fullSudoku=checkSudoku(S)
+    if validSudoku:
+        if not fullSudoku:
+            print("Sudoku is valid, checking twins")
+            twins=findTwins(S)
+            for t in twins:
+                xt=t[0]
+                yt=t[1]
+                trySudoku=copy.deepcopy(S)
+                for tryValue in S[yt][xt]:
+                    trySudoku[yt][xt]={tryValue}
+                    tryValid,trySudoku=solveDoku(trySudoku)
+                    if tryValid:
+                        return True,trySudoku
+        print("Sudoku completed")
+        return True,S
+    else:
+        print("Error solving sudoku")
+        return False,S
+
