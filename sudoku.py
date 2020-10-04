@@ -1,9 +1,7 @@
 #!/usr/bin/env python3
 
 import sudoku_functions
-from sudoku_functions import printSudoku,rawSudoku,loadSudoku,writeSudoku,digSudoku,checkSudoku,findUnique,findTwins,solveDoku
-
-
+from sudoku_functions import printSudoku,rawSudoku,loadSudoku,writeSudoku,checkSudoku,solveDoku
 
 S=[
    [set(),set(),set(),set(),set(),set(),set(),set(),set()],
