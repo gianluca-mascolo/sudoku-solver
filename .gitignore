@@ -2,3 +2,5 @@ sol.txt
 __pycache__/**
 .venv/**
 .venv
+*.pyc
+**/__pycache__/**
