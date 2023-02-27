@@ -1,2 +1,4 @@
 sol.txt
 __pycache__/**
+.venv/**
+.venv

@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "sudoku-solver"
+version = "0.1.0"
+description = "Sudoku solver"
+authors = ["Gianluca Mascolo <gianluca@gurutech.it>"]
+license = "GPL-3.0-or-later"
+homepage = "https://github.com/gianluca-mascolo/sudoku-solver/"
+repository = "https://github.com/gianluca-mascolo/sudoku-solver/"
+readme = "README.md"
+packages = [{include = "sudoku_solver"}]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+sudoku_solver = "sudoku_solver.sudoku:main"
