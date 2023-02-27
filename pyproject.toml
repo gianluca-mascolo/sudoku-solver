@@ -18,4 +18,4 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-sudoku_solver = "sudoku_solver.sudoku:main"
+sudoku = "sudoku_solver.sudoku:main"
