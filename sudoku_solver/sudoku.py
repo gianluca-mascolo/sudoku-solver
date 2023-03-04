@@ -143,9 +143,22 @@ class SudokuBoard:
         return True
 
 
+def load_sudoku(sudoku_file):
+    sudoku = SudokuBoard()
+    y = 0
+    with open(sudoku_file, "r") as f:
+        for line in f:
+            for x in range(9):
+                if line[x] != "*":
+                    sudoku.board[y][x] = {line[x]}
+            y += 1
+    f.closed
+    return sudoku
+
+
 def main():
     sudoku = SudokuBoard()
-    print(sudoku.board)
+    print(sudoku.valid())
 
 
 if __name__ == "__main__":
