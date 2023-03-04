@@ -104,6 +104,17 @@ class SudokuBoard:
             ],
         ]
 
+    def full(self):
+        uniqueSets = 0
+        for y in range(9):
+            for x in range(9):
+                if len(self.board[y][x]) == 1:
+                    uniqueSets += 1
+        if uniqueSets == 81:
+            return True
+        else:
+            return False
+
     def valid(self):
         for y in range(9):
             for x in range(9):
@@ -129,14 +140,30 @@ class SudokuBoard:
                             ] == self.board[y][x]:
                                 print("Duplicate in square")
                                 return False
-                print(self.board[y][x])
         return True
 
 
 def main():
     sudoku = SudokuBoard()
-    print(sudoku.valid())
-    print("main")
+    print("Is Valid: {0}".format(sudoku.valid()))
+    print("Is Full: {0}".format(sudoku.full()))
+    sudoku.board[0][0] = {"1"}
+    sudoku.board[0][1] = {"1"}
+    print("Is Valid: {0}".format(sudoku.valid()))
+    print("Is Full: {0}".format(sudoku.full()))
+    sudoku.board = [
+        [{"3"}, {"4"}, {"9"}, {"1"}, {"6"}, {"7"}, {"2"}, {"5"}, {"8"}],
+        [{"2"}, {"8"}, {"1"}, {"4"}, {"3"}, {"5"}, {"6"}, {"7"}, {"9"}],
+        [{"5"}, {"6"}, {"7"}, {"2"}, {"8"}, {"9"}, {"1"}, {"3"}, {"4"}],
+        [{"8"}, {"7"}, {"2"}, {"6"}, {"5"}, {"1"}, {"4"}, {"9"}, {"3"}],
+        [{"1"}, {"3"}, {"4"}, {"7"}, {"9"}, {"2"}, {"5"}, {"8"}, {"6"}],
+        [{"6"}, {"9"}, {"5"}, {"8"}, {"4"}, {"3"}, {"7"}, {"1"}, {"2"}],
+        [{"7"}, {"2"}, {"8"}, {"3"}, {"1"}, {"6"}, {"9"}, {"4"}, {"5"}],
+        [{"9"}, {"1"}, {"3"}, {"5"}, {"2"}, {"4"}, {"8"}, {"6"}, {"7"}],
+        [{"4"}, {"5"}, {"6"}, {"9"}, {"7"}, {"8"}, {"3"}, {"2"}, {"1"}],
+    ]
+    print("Is Valid: {0}".format(sudoku.valid()))
+    print("Is Full: {0}".format(sudoku.full()))
 
 
 if __name__ == "__main__":
