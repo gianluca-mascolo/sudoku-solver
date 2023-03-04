@@ -1,8 +1,14 @@
 #!/usr/bin/env python3
 
 import sudoku_functions
-from sudoku_functions import (checkSudoku, loadSudoku, printSudoku, rawSudoku,
-                              solveDoku, writeSudoku)
+from sudoku_functions import (
+    checkSudoku,
+    loadSudoku,
+    printSudoku,
+    rawSudoku,
+    solveDoku,
+    writeSudoku,
+)
 
 S = [
     [set(), set(), set(), set(), set(), set(), set(), set(), set()],
