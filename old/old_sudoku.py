@@ -1,22 +1,23 @@
 #!/usr/bin/env python3
 
 import sudoku_functions
-from sudoku_functions import printSudoku,rawSudoku,loadSudoku,writeSudoku,checkSudoku,solveDoku
+from sudoku_functions import (checkSudoku, loadSudoku, printSudoku, rawSudoku,
+                              solveDoku, writeSudoku)
 
-S=[
-   [set(),set(),set(),set(),set(),set(),set(),set(),set()],
-   [set(),set(),set(),set(),set(),set(),set(),set(),set()],
-   [set(),set(),set(),set(),set(),set(),set(),set(),set()],
-   [set(),set(),set(),set(),set(),set(),set(),set(),set()],
-   [set(),set(),set(),set(),set(),set(),set(),set(),set()],
-   [set(),set(),set(),set(),set(),set(),set(),set(),set()],
-   [set(),set(),set(),set(),set(),set(),set(),set(),set()],
-   [set(),set(),set(),set(),set(),set(),set(),set(),set()],
-   [set(),set(),set(),set(),set(),set(),set(),set(),set()]
-  ]
+S = [
+    [set(), set(), set(), set(), set(), set(), set(), set(), set()],
+    [set(), set(), set(), set(), set(), set(), set(), set(), set()],
+    [set(), set(), set(), set(), set(), set(), set(), set(), set()],
+    [set(), set(), set(), set(), set(), set(), set(), set(), set()],
+    [set(), set(), set(), set(), set(), set(), set(), set(), set()],
+    [set(), set(), set(), set(), set(), set(), set(), set(), set()],
+    [set(), set(), set(), set(), set(), set(), set(), set(), set()],
+    [set(), set(), set(), set(), set(), set(), set(), set(), set()],
+    [set(), set(), set(), set(), set(), set(), set(), set(), set()],
+]
 
-S=loadSudoku('s.txt',S)
-validSudoku,fullSudoku=checkSudoku(S)
+S = loadSudoku("s.txt", S)
+validSudoku, fullSudoku = checkSudoku(S)
 if validSudoku:
     if fullSudoku:
         print("Sudoku completed")
@@ -28,9 +29,9 @@ else:
     print("Input file not valid")
     exit(1)
 
-validSudoku,S=solveDoku(S)
+validSudoku, S = solveDoku(S)
 if validSudoku:
-    writeSudoku('sol.txt',S)
+    writeSudoku("sol.txt", S)
 else:
     print("Error solving sudoku")
     rawSudoku(S)
