@@ -11,7 +11,7 @@ class SudokuBoard:
     def valid(self):
         for pos, element in enumerate(self.board):
             if element == set():
-                print("Cell is empty")
+                print("Cell is empty at Board {0}".format(pos))
                 return False
             if element.issubset(self.cell) is False:
                 print("Invalid cell content: {0}".format(element))
@@ -65,9 +65,7 @@ def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
 
 def main():
     sudoku = SudokuBoard()
-    sudoku.board[0] = {"3"}
-    sudoku.board[9] = {"3"}
-    # print(sudoku.full())
+    print(sudoku.full())
     print(sudoku.valid())
 
 
