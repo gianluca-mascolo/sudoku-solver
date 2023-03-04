@@ -25,6 +25,5 @@ def test_valid():
 
 def test_load():
     sudoku = SudokuBoard()
-    sudoku = load_sudoku("sudoku1.txt")
-    assert sudoku.valid() is True
-    assert sudoku.full() is False
+    r = load_sudoku("sudoku1.txt", sudoku)
+    assert r

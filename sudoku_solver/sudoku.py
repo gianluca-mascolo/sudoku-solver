@@ -143,8 +143,7 @@ class SudokuBoard:
         return True
 
 
-def load_sudoku(sudoku_file):
-    sudoku = SudokuBoard()
+def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
     y = 0
     with open(sudoku_file, "r") as f:
         for line in f:
@@ -153,7 +152,7 @@ def load_sudoku(sudoku_file):
                     sudoku.board[y][x] = {line[x]}
             y += 1
     f.closed
-    return sudoku
+    return sudoku.valid()
 
 
 def main():
