@@ -30,13 +30,14 @@ class SudokuBoard:
                     return False
         return True
 
-    def unique(self):
-        return [x for x in range(81) if len(self.board[x]) == 1]
+    def list_unique(self, exclude=[]):
+        return [x for x in range(81) if len(self.board[x]) == 1 and x not in exclude]
 
-
-class SudokuChecklist:
-    def __init__(self):
-        self.checklist = [{"checked": False, "unique": False, "value": ""} for x in range(81)]
+    def is_unique(self, pos: int):
+        if len(self.board[pos]) == 1:
+            return str(next(iter(self.board[pos])))
+        else:
+            return False
 
 
 def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
@@ -51,56 +52,27 @@ def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
     return sudoku.valid()
 
 
-def neighbor(pos: int, unique=[]):
+def neighbor(pos: int, exclude=[]):
     line = [x for x in range(9 * (pos // 9), 9 * (pos // 9) + 9) if x != pos]
     column = [x for x in range(pos % 9, 81, 9) if x != pos]
     square = [x for x in range(81) if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3 and x != pos]
-    return list(set(line + column + square) - set(unique))
+    return list(set(line + column + square) - set(exclude))
 
 
 def main():
     sudoku = SudokuBoard()
     load_sudoku("sudoku1.txt", sudoku)
     print(sudoku.valid())
-    control = SudokuChecklist()
-    for x in sudoku.unique():
-        control.checklist[x]["unique"] = True
-        control.checklist[x]["value"] = str(next(iter(sudoku.board[x])))
-
-    # for x in control.checklist:
-    #     print(f"{x['checked']} {x['unique']} {x['value']}")
-    # print(sudoku.board)
-    # board_len = sum(list(map(lambda x: len(x), self.board)))
-    totunique = sum(list(map(lambda x: x["unique"], control.checklist)))
-    print(f"tot: {totunique}")
-    for pos, x in enumerate(control.checklist):
-        if x["unique"] is True and x["checked"] is False:
-            # print(neighbor(pos))
-            for p in neighbor(pos, unique=sudoku.unique()):
-                print(
-                    f"Operation * value position: {pos} delete value: {x['value']} sudoku cell: {p} sudoku content: {sudoku.board[p]} cell len: {len(sudoku.board[p])} sudoku valid: {sudoku.valid()}"
-                )
-                sudoku.board[p].discard(x["value"])
-                if len(sudoku.board[p]) == 1:
-                    control.checklist[p]["unique"] = True
-                    control.checklist[p]["value"] = str(next(iter(sudoku.board[p])))
-                print(f"Result * value position: {pos} delete value: {x['value']} sudoku cell: {p} sudoku content: {sudoku.board[p]} cell len: {len(sudoku.board[p])} sudoku valid: {sudoku.valid()}")
-                control.checklist[pos]["checked"] = True
-    totunique = sum(list(map(lambda x: x["unique"], control.checklist)))
-    print(f"tot: {totunique}")
-    # print(sudoku.board)
-    # print(sudoku.unique())
-    # print(neighbor(0))
-    # sudoku.board[1] = {"1"}
-    # sudoku.board[9] = {"1"}
-
-    # print(sudoku.full())
-    # print(sudoku.valid())
+    checked = set()
+    while sudoku.valid() and sudoku.full() is False and len(sudoku.list_unique()) > len(checked):
+        print(f"Total unique: {len(sudoku.list_unique())} {len(checked)} {len(sudoku.list_unique())}")
+        for x in sudoku.list_unique(exclude=list(checked)):
+            for p in neighbor(x, exclude=sudoku.list_unique()):
+                sudoku.board[p].discard(sudoku.is_unique(x))
+                checked.add(x)
+        print(f"Total unique: {len(sudoku.list_unique())} {len(checked)} {len(sudoku.list_unique())}")
+    print(sudoku.board)
 
 
 if __name__ == "__main__":
     main()
-
-
-# for x in range(81):
-#    print("x: {0} r: {1}, q: {2} t: {3}".format(x,x//9//3,x//3%3,3*(x//9//3)+x//3%3))

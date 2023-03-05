@@ -100,3 +100,12 @@ def test_load():
     sudoku = SudokuBoard()
     r = load_sudoku("sudoku1.txt", sudoku)
     assert r
+
+
+def test_unique():
+    sudoku = SudokuBoard()
+    sudoku.board[0] = {"1"}
+    assert sudoku.is_unique(0)
+    assert sudoku.is_unique(1) is False
+    assert sudoku.list_unique() == [0]
+    assert sudoku.list_unique(exclude=[0]) == []
