@@ -1,8 +1,7 @@
 #!/usr/bin/python3
 class SudokuBoard:
     def __init__(self):
-        self.cell = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
-        self.board = [self.cell for x in range(81)]
+        self.board = [{"1", "2", "3", "4", "5", "6", "7", "8", "9"} for x in range(81)]
 
     def full(self):
         board_len = sum(list(map(lambda x: len(x), self.board)))
@@ -13,8 +12,8 @@ class SudokuBoard:
             if element == set():
                 print("Cell is empty at Board {0}".format(pos))
                 return False
-            if element.issubset(self.cell) is False:
-                print("Invalid cell content: {0}".format(element))
+            if element.issubset({"1", "2", "3", "4", "5", "6", "7", "8", "9"}) is False:
+                print("Invalid cell. position: {0} content: {1}".format(pos, element))
                 return False
             if len(element) == 1:
                 line = [self.board[x] for x in range(9 * (pos // 9), 9 * (pos // 9) + 9) if x != pos]
@@ -37,7 +36,7 @@ class SudokuBoard:
 
 class SudokuChecklist:
     def __init__(self):
-        self.checklist = [{"checked": False, "unique": False} for x in range(81)]
+        self.checklist = [{"checked": False, "unique": False, "value": ""} for x in range(81)]
 
 
 def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
@@ -52,23 +51,34 @@ def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
     return sudoku.valid()
 
 
-def neighbor(pos: int):
+def neighbor(pos: int, unique=[]):
     line = [x for x in range(9 * (pos // 9), 9 * (pos // 9) + 9) if x != pos]
     column = [x for x in range(pos % 9, 81, 9) if x != pos]
     square = [x for x in range(81) if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3 and x != pos]
-    return line + column + square
+    return list(set(line + column + square) - set(unique))
 
 
 def main():
     sudoku = SudokuBoard()
     load_sudoku("sudoku1.txt", sudoku)
+    print(sudoku.valid())
     control = SudokuChecklist()
     for x in sudoku.unique():
         control.checklist[x]["unique"] = True
+        control.checklist[x]["value"] = str(next(iter(sudoku.board[x])))
+
+    # for x in control.checklist:
+    #     print(f"{x['checked']} {x['unique']} {x['value']}")
+    # print(sudoku.board)
     for pos, x in enumerate(control.checklist):
         if x["unique"] is True and x["checked"] is False:
-            print(pos)
-
+            # print(neighbor(pos))
+            for p in neighbor(pos, unique=sudoku.unique()):
+                print(f"Operation * value position: {pos} delete value: {x['value']} sudoku cell: {p} sudoku content: {sudoku.board[p]} sudoku valid: {sudoku.valid()}")
+                sudoku.board[p].discard(x["value"])
+                print(f"Result * value position: {pos} delete value: {x['value']} sudoku cell: {p} sudoku content: {sudoku.board[p]} sudoku valid: {sudoku.valid()}")
+                control.checklist[pos]["checked"] = True
+    # print(sudoku.board)
     # print(sudoku.unique())
     # print(neighbor(0))
     # sudoku.board[1] = {"1"}
