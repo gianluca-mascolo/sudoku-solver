@@ -62,15 +62,13 @@ def neighbor(pos: int, exclude=[]):
 def main():
     sudoku = SudokuBoard()
     load_sudoku("sudoku1.txt", sudoku)
-    print(sudoku.valid())
     checked = set()
     while sudoku.valid() and sudoku.full() is False and len(sudoku.list_unique()) > len(checked):
-        print(f"Total unique: {len(sudoku.list_unique())} {len(checked)} {len(sudoku.list_unique())}")
+        print(f"Total unique: {len(sudoku.list_unique())} {len(checked)}")
         for x in sudoku.list_unique(exclude=list(checked)):
             for p in neighbor(x, exclude=sudoku.list_unique()):
                 sudoku.board[p].discard(sudoku.is_unique(x))
                 checked.add(x)
-        print(f"Total unique: {len(sudoku.list_unique())} {len(checked)} {len(sudoku.list_unique())}")
     print(sudoku.board)
 
 
