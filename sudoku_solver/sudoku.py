@@ -35,6 +35,11 @@ class SudokuBoard:
         return [x for x in range(81) if len(self.board[x]) == 1]
 
 
+class SudokuChecklist:
+    def __init__(self):
+        self.checklist = [{"checked": False, "unique": False} for x in range(81)]
+
+
 def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
     y = 0
     with open(sudoku_file, "r") as f:
@@ -57,8 +62,15 @@ def neighbor(pos: int):
 def main():
     sudoku = SudokuBoard()
     load_sudoku("sudoku1.txt", sudoku)
-    print(sudoku.unique())
-    print(neighbor(0))
+    control = SudokuChecklist()
+    for x in sudoku.unique():
+        control.checklist[x]["unique"] = True
+    for pos, x in enumerate(control.checklist):
+        if x["unique"] is True and x["checked"] is False:
+            print(pos)
+
+    # print(sudoku.unique())
+    # print(neighbor(0))
     # sudoku.board[1] = {"1"}
     # sudoku.board[9] = {"1"}
 
