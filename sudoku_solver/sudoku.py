@@ -25,13 +25,14 @@ class SudokuBoard:
                 if element in column:
                     print("Duplicate in column")
                     return False
-                for x in range(81):
-                    if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3:
-                        if x != pos:
-                            if self.board[x] == element:
-                                print("Duplicate in Square. Board {0} and Board {1} equal {2}".format(x, pos, element))
-                                return False
+                square = [self.board[x] for x in range(81) if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3 and x != pos]
+                if element in square:
+                    print("Duplicate in square")
+                    return False
         return True
+
+    def unique(self):
+        return [x for x in range(81) if len(self.board[x]) == 1]
 
 
 def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
@@ -46,13 +47,23 @@ def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
     return sudoku.valid()
 
 
+def neighbor(pos: int):
+    line = [x for x in range(9 * (pos // 9), 9 * (pos // 9) + 9) if x != pos]
+    column = [x for x in range(pos % 9, 81, 9) if x != pos]
+    square = [x for x in range(81) if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3 and x != pos]
+    return line + column + square
+
+
 def main():
     sudoku = SudokuBoard()
-    sudoku.board[1] = {"1"}
-    sudoku.board[10] = {"1"}
+    load_sudoku("sudoku1.txt", sudoku)
+    print(sudoku.unique())
+    print(neighbor(0))
+    # sudoku.board[1] = {"1"}
+    # sudoku.board[9] = {"1"}
 
-    print(sudoku.full())
-    print(sudoku.valid())
+    # print(sudoku.full())
+    # print(sudoku.valid())
 
 
 if __name__ == "__main__":
