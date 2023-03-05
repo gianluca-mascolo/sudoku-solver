@@ -17,24 +17,18 @@ class SudokuBoard:
                 print("Invalid cell content: {0}".format(element))
                 return False
             if len(element) == 1:
-                for x in range(9 * (pos // 9), 9 * (pos // 9) + 9):
-                    if x != pos:
-                        if self.board[x] == element:
-                            print(
-                                "Duplicate in line. Board {0} and Board {1} equal {2}".format(
-                                    x, pos, element
-                                )
-                            )
-                            return False
-                for x in range(pos % 9, 81, 9):
-                    if x != pos:
-                        if self.board[x] == element:
-                            print(
-                                "Duplicate in Column. Board {0} and Board {1} equal {2}".format(
-                                    x, pos, element
-                                )
-                            )
-                            return False
+                line = [
+                    self.board[x]
+                    for x in range(9 * (pos // 9), 9 * (pos // 9) + 9)
+                    if x != pos
+                ]
+                if element in line:
+                    print("Duplicate in line")
+                    return False
+                column = [self.board[x] for x in range(pos % 9, 81, 9) if x != pos]
+                if element in column:
+                    print("Duplicate in column")
+                    return False
                 for x in range(81):
                     if (
                         3 * (x // 9 // 3) + x // 3 % 3
@@ -65,6 +59,9 @@ def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
 
 def main():
     sudoku = SudokuBoard()
+    sudoku.board[1] = {"1"}
+    sudoku.board[10] = {"1"}
+
     print(sudoku.full())
     print(sudoku.valid())
 
