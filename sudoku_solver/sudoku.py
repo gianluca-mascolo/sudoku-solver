@@ -51,7 +51,7 @@ def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
         for line in f:
             for x in range(9):
                 if line[x] != "*":
-                    sudoku.board[y][x] = {line[x]}
+                    sudoku.board[y * 9 + x] = {line[x]}
             y += 1
     f.closed
     return sudoku.valid()

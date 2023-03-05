@@ -1,6 +1,4 @@
-from sudoku_solver.sudoku import SudokuBoard
-
-# , load_sudoku
+from sudoku_solver.sudoku import SudokuBoard, load_sudoku
 
 
 def test_valid():
@@ -98,7 +96,7 @@ def test_valid():
     assert sudoku.full() is True
 
 
-# def test_load():
-#     sudoku = SudokuBoard()
-#     r = load_sudoku("sudoku1.txt", sudoku)
-#     assert r
+def test_load():
+    sudoku = SudokuBoard()
+    r = load_sudoku("sudoku1.txt", sudoku)
+    assert r
