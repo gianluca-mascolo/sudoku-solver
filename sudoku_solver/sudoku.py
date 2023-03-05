@@ -70,14 +70,24 @@ def main():
     # for x in control.checklist:
     #     print(f"{x['checked']} {x['unique']} {x['value']}")
     # print(sudoku.board)
+    # board_len = sum(list(map(lambda x: len(x), self.board)))
+    totunique = sum(list(map(lambda x: x["unique"], control.checklist)))
+    print(f"tot: {totunique}")
     for pos, x in enumerate(control.checklist):
         if x["unique"] is True and x["checked"] is False:
             # print(neighbor(pos))
             for p in neighbor(pos, unique=sudoku.unique()):
-                print(f"Operation * value position: {pos} delete value: {x['value']} sudoku cell: {p} sudoku content: {sudoku.board[p]} sudoku valid: {sudoku.valid()}")
+                print(
+                    f"Operation * value position: {pos} delete value: {x['value']} sudoku cell: {p} sudoku content: {sudoku.board[p]} cell len: {len(sudoku.board[p])} sudoku valid: {sudoku.valid()}"
+                )
                 sudoku.board[p].discard(x["value"])
-                print(f"Result * value position: {pos} delete value: {x['value']} sudoku cell: {p} sudoku content: {sudoku.board[p]} sudoku valid: {sudoku.valid()}")
+                if len(sudoku.board[p]) == 1:
+                    control.checklist[p]["unique"] = True
+                    control.checklist[p]["value"] = str(next(iter(sudoku.board[p])))
+                print(f"Result * value position: {pos} delete value: {x['value']} sudoku cell: {p} sudoku content: {sudoku.board[p]} cell len: {len(sudoku.board[p])} sudoku valid: {sudoku.valid()}")
                 control.checklist[pos]["checked"] = True
+    totunique = sum(list(map(lambda x: x["unique"], control.checklist)))
+    print(f"tot: {totunique}")
     # print(sudoku.board)
     # print(sudoku.unique())
     # print(neighbor(0))
