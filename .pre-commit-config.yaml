@@ -29,7 +29,7 @@ repos:
     -   id: poetry-black
         name: poetry-black
         description: run poetry black
-        entry: sh -c 'poetry run black --extend-exclude old .'
+        entry: sh -c 'poetry run black .'
         language: system
         pass_filenames: false
         files: ^sudoku_solver/

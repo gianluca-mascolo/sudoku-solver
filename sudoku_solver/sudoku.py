@@ -17,11 +17,7 @@ class SudokuBoard:
                 print("Invalid cell content: {0}".format(element))
                 return False
             if len(element) == 1:
-                line = [
-                    self.board[x]
-                    for x in range(9 * (pos // 9), 9 * (pos // 9) + 9)
-                    if x != pos
-                ]
+                line = [self.board[x] for x in range(9 * (pos // 9), 9 * (pos // 9) + 9) if x != pos]
                 if element in line:
                     print("Duplicate in line")
                     return False
@@ -30,17 +26,10 @@ class SudokuBoard:
                     print("Duplicate in column")
                     return False
                 for x in range(81):
-                    if (
-                        3 * (x // 9 // 3) + x // 3 % 3
-                        == 3 * (pos // 9 // 3) + pos // 3 % 3
-                    ):
+                    if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3:
                         if x != pos:
                             if self.board[x] == element:
-                                print(
-                                    "Duplicate in Square. Board {0} and Board {1} equal {2}".format(
-                                        x, pos, element
-                                    )
-                                )
+                                print("Duplicate in Square. Board {0} and Board {1} equal {2}".format(x, pos, element))
                                 return False
         return True
 
