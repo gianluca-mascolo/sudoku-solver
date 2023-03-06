@@ -15,18 +15,9 @@ class SudokuBoard:
             if element.issubset({"1", "2", "3", "4", "5", "6", "7", "8", "9"}) is False:
                 print("Invalid cell. position: {0} content: {1}".format(pos, element))
                 return False
-            if len(element) == 1:
-                line = [self.board[x] for x in range(9 * (pos // 9), 9 * (pos // 9) + 9) if x != pos]
-                if element in line:
-                    print("Duplicate in line")
-                    return False
-                column = [self.board[x] for x in range(pos % 9, 81, 9) if x != pos]
-                if element in column:
-                    print("Duplicate in column")
-                    return False
-                square = [self.board[x] for x in range(81) if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3 and x != pos]
-                if element in square:
-                    print("Duplicate in square")
+            if self.is_unique(pos):
+                if element in [self.board[x] for x in neighbor(pos)]:
+                    print("Find duplicate {0}".format(element))
                     return False
         return True
 
