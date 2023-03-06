@@ -41,13 +41,10 @@ class SudokuBoard:
 
 
 def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
-    y = 0
     with open(sudoku_file, "r") as f:
-        for line in f:
-            for x in range(9):
-                if line[x] != "*":
-                    sudoku.board[y * 9 + x] = {line[x]}
-            y += 1
+        for pos, c in enumerate(f.read()):
+            if pos - pos // 10 < 81 and c in {"1", "2", "3", "4", "5", "6", "7", "8", "9"}:
+                sudoku.board[pos - pos // 10] = {c}
     f.closed
     return sudoku.valid()
 
