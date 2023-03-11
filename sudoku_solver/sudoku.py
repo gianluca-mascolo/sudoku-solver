@@ -12,6 +12,9 @@ class SudokuBoard:
         board_len = sum(list(map(lambda x: len(x), self.board)))
         return board_len == 81
 
+    def length(self):
+        return len(list(filter(lambda x: len(x) == 1, self.board)))
+
     def valid(self):
         for pos, element in enumerate(self.board):
             if element == set():
@@ -25,12 +28,6 @@ class SudokuBoard:
                     print("Find duplicate {0}".format(element))
                     return False
         return True
-
-    def list_elements(self, multiple):
-        if multiple:
-            return [{"position": x, "element": self.board[x]} for x in range(81) if len(self.board[x]) > 1]
-        else:
-            return [{"position": x, "element": self.board[x]} for x in range(81) if len(self.board[x]) == 1]
 
     def list_twins(self, exclude=[]):
         twins = []
@@ -110,7 +107,8 @@ def print_sudoku(sudoku: SudokuBoard):
 def solve_sudoku(sudoku: SudokuBoard):
     print("solving sudoku")
     checked = set()
-    while sudoku.valid() and sudoku.full() is False and len(sudoku.list_elements(multiple=False)) > len(checked):
+    while sudoku.valid() and sudoku.full() is False and sudoku.length() > len(checked):
+        print(f"sudoku len: {sudoku.length()}")
         for position, element in filter(lambda x: len(x[1]) == 1, enumerate(sudoku.board)):
             for p in neighbor(position)["all"]:
                 sudoku.board[p] -= element
