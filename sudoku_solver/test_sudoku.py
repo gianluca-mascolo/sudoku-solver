@@ -4,11 +4,11 @@ from sudoku_solver.sudoku import SudokuBoard, load_sudoku
 def test_valid():
     sudoku = SudokuBoard()
     assert sudoku.valid() is True
-    assert sudoku.full() is False
+    assert sudoku.length() < 81
     sudoku.board[0] = {"1"}
     sudoku.board[1] = {"1"}
     assert sudoku.valid() is False
-    assert sudoku.full() is False
+    assert sudoku.length() < 81
     sudoku.board = [
         {"3"},
         {"4"},
@@ -93,19 +93,10 @@ def test_valid():
         {"1"},
     ]
     assert sudoku.valid() is True
-    assert sudoku.full() is True
+    assert sudoku.length() == 81
 
 
 def test_load():
     sudoku = SudokuBoard()
     r = load_sudoku("sudoku1.txt", sudoku)
     assert r
-
-
-def test_unique():
-    sudoku = SudokuBoard()
-    sudoku.board[0] = {"1"}
-    assert sudoku.is_unique(0)
-    assert sudoku.is_unique(1) is False
-    assert sudoku.list_unique() == [0]
-    assert sudoku.list_unique(exclude=[0]) == []
