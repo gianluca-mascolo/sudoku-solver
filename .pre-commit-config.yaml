@@ -1,0 +1,44 @@
+# Note: this file does nothing unless you install pre-commit hooks locally
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+    -   id: trailing-whitespace
+    -   id: end-of-file-fixer
+    -   id: check-added-large-files
+    -   id: check-yaml
+-   repo: local
+    hooks:
+    -   id: poetry-check
+        name: poetry-check
+        description: run poetry check to validate config
+        entry: sh -c 'poetry check'
+        language: system
+        pass_filenames: false
+        files: ^pyproject.toml$
+    -   id: poetry-isort
+        name: poetry-isort
+        description: run poetry isort
+        entry: sh -c 'poetry run isort .'
+        language: system
+        pass_filenames: false
+        files: ^sudoku_solver/
+        types: [file, python]
+    -   id: poetry-black
+        name: poetry-black
+        description: run poetry black
+        entry: sh -c 'poetry run black .'
+        language: system
+        pass_filenames: false
+        files: ^sudoku_solver/
+        types: [file, python]
+    -   id: poetry-flake8
+        name: poetry-flake8
+        description: run poetry flake8
+        entry: sh -c 'poetry run flake8 .'
+        language: system
+        pass_filenames: false
+        files: ^sudoku_solver/
+        types: [file, python]
