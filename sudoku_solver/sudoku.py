@@ -8,10 +8,6 @@ class SudokuBoard:
     def __init__(self):
         self.board = [{"1", "2", "3", "4", "5", "6", "7", "8", "9"} for x in range(81)]
 
-    def full(self):
-        board_len = sum(list(map(lambda x: len(x), self.board)))
-        return board_len == 81
-
     def length(self):
         return len(list(filter(lambda x: len(x) == 1, self.board)))
 
@@ -28,18 +24,6 @@ class SudokuBoard:
                     print("Find duplicate {0}".format(element))
                     return False
         return True
-
-    def list_twins(self, exclude=[]):
-        twins = []
-        twins_checked = set()
-        for pos in range(81):
-            if len(self.board[pos]) == 2:
-                for x in neighbor(pos=pos)["all"]:
-                    if self.board[pos] == self.board[x] and x not in twins_checked:
-                        twins.append({"position": [pos, x], "element": self.board[pos]})
-                        twins_checked.add(pos)
-                        twins_checked.add(x)
-        return twins
 
 
 def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
@@ -107,7 +91,7 @@ def print_sudoku(sudoku: SudokuBoard):
 def solve_sudoku(sudoku: SudokuBoard):
     print("solving sudoku")
     checked = set()
-    while sudoku.valid() and sudoku.full() is False and sudoku.length() > len(checked):
+    while sudoku.valid() and sudoku.length() < 81 and sudoku.length() > len(checked):
         print(f"sudoku len: {sudoku.length()}")
         for position, element in filter(lambda x: len(x[1]) == 1, enumerate(sudoku.board)):
             for p in neighbor(position)["all"]:
