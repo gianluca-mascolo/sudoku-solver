@@ -72,10 +72,6 @@ def neighbor(pos: int):
     # }
 
 
-def is_alone(pos: int, sudoku: SudokuBoard):
-    return True
-
-
 def twin_neighbor(t1: int, t2: int):
     line = [x for x in range(9 * (t1 // 9), 9 * (t1 // 9) + 9) if x != t1]
     column = [x for x in range(t1 % 9, 81, 9) if x != t1]
@@ -91,7 +87,6 @@ def twin_neighbor(t1: int, t2: int):
 
 
 def print_sudoku(sudoku: SudokuBoard):
-    unique_numbers = sudoku.list_elements(multiple=False)
     print("+---+---+---+")
     for p in range(81):
         if p % 3 == 0:
@@ -102,7 +97,7 @@ def print_sudoku(sudoku: SudokuBoard):
                 print("|", end="")
             else:
                 print("|", end="")
-        if p in [x["position"] for x in unique_numbers]:
+        if len(sudoku.board[p]) == 1:
             print(str(next(iter(sudoku.board[p]))), end="")
         else:
             print("_", end="")
