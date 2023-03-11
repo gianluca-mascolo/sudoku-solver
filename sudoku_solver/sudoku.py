@@ -35,36 +35,24 @@ def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
     return sudoku.valid()
 
 
-def neighbor(pos: int):
+def neighbor(pos: int, match=None):
     line = [x for x in range(9 * (pos // 9), 9 * (pos // 9) + 9) if x != pos]
     column = [x for x in range(pos % 9, 81, 9) if x != pos]
     square = [x for x in range(81) if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3 and x != pos]
-    return {
-        "line": line,
-        "column": column,
-        "square": square,
-        "all": list(set(line + column + square)),
-    }
-    # return {
-    #     "line": [x for x in line if x not in exclude],
-    #     "column": [x for x in column if x not in exclude],
-    #     "square": [x for x in square if x not in exclude],
-    #     "all": list(set(line + column + square) - set(exclude)),
-    # }
-
-
-def twin_neighbor(t1: int, t2: int):
-    line = [x for x in range(9 * (t1 // 9), 9 * (t1 // 9) + 9) if x != t1]
-    column = [x for x in range(t1 % 9, 81, 9) if x != t1]
-    square = [x for x in range(81) if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (t1 // 9 // 3) + t1 // 3 % 3 and x != t1]
-    if t2 in line:
-        return list(set(line) - set([t2]))
-    elif t2 in column:
-        return list(set(column) - set([t2]))
-    elif t2 in square:
-        return list(set(square) - set([t2]))
+    if not match:
+        return {
+            "line": line,
+            "column": column,
+            "square": square,
+            "all": list(set(line + column + square)),
+        }
     else:
-        return []
+        return {
+            "line": [x for x in line if match in line and x != match],
+            "column": [x for x in column if match in column and x != match],
+            "square": [x for x in square if match in square and x != match],
+            "all": [],
+        }
 
 
 def print_sudoku(sudoku: SudokuBoard):
@@ -104,15 +92,16 @@ def solve_sudoku(sudoku: SudokuBoard):
         for position, element in (twins := list(filter(lambda x: len(x[1]) == 2, enumerate(sudoku.board)))):
             twins_position = set([x[0] for x in twins if x[1] == element])
             for combo in combinations(twins_position, 2):
-                for p in twin_neighbor(combo[0], combo[1]):
-                    sudoku.board[p].difference_update(element)
+                for group in ["line", "square", "column"]:
+                    for p in neighbor(pos=combo[0], match=combo[1])[group]:
+                        sudoku.board[p].difference_update(element)
         print_sudoku(sudoku)
     return sudoku.valid()
 
 
 def main():
     sudoku = SudokuBoard()
-    load_sudoku("sudoku2.txt", sudoku)
+    load_sudoku("sudoku3.txt", sudoku)
     print_sudoku(sudoku)
     solve_sudoku(sudoku)
     print(sudoku.valid())
