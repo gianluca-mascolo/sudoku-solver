@@ -95,34 +95,35 @@ def solve_sudoku(sudoku: SudokuBoard):
                 for group in ["line", "square", "column"]:
                     for p in neighbor(pos=combo[0], match=combo[1])[group]:
                         sudoku.board[p].difference_update(element)
-        # for position, element in filter(lambda x: len(x[1]) == 2, enumerate(sudoku.board)):
-        #     trydoku = copy.deepcopy(sudoku.board)
-        #     for v in element:
-        #         print(f"try {v} in position {position}")
-        #         sudoku.board[position]={v}
-        #         if not solve_sudoku(sudoku):
-        #             sudoku.board = copy.deepcopy(trydoku)
-        #         return sudoku.valid()
         print_sudoku(sudoku)
     return sudoku.valid()
 
 
+def cursedoku(sudoku: SudokuBoard):
+    if sudoku.valid():
+        if sudoku.length() == 81:
+            return True
+        else:
+            print("*** recurse sudoku")
+            for position, element in filter(lambda x: len(x[1]) > 1, enumerate(sudoku.board)):
+                trydoku = copy.deepcopy(sudoku.board)
+                for v in element:
+                    sudoku.board[position] = {v}
+                    solve_sudoku(sudoku)
+                    if not cursedoku(sudoku):
+                        sudoku.board = copy.deepcopy(trydoku)
+                    else:
+                        return True
+    else:
+        return False
+
+
 def main():
     sudoku = SudokuBoard()
-    load_sudoku("sudoku3.txt", sudoku)
+    load_sudoku("sudoku2.txt", sudoku)
     print_sudoku(sudoku)
     solve_sudoku(sudoku)
-    while sudoku.valid() and sudoku.length() < 81:
-        for position, element in filter(lambda x: len(x[1]) == 2, enumerate(sudoku.board)):
-            print(f"p {position} e {element}")
-            trydoku = copy.deepcopy(sudoku.board)
-            for v in element:
-                print(f"try {v} in position {position}")
-                sudoku.board[position] = {v}
-                if not solve_sudoku(sudoku):
-                    sudoku.board = copy.deepcopy(trydoku)
-                else:
-                    break
+    cursedoku(sudoku)
     print(sudoku.valid())
     print_sudoku(sudoku)
 
