@@ -99,32 +99,35 @@ def solve_sudoku(sudoku: SudokuBoard):
     return sudoku.valid()
 
 
-def cursedoku(sudoku: SudokuBoard):
+def cursedoku(sudoku: SudokuBoard, depth=0):
     if sudoku.valid():
         if sudoku.length() == 81:
             return True
         else:
-            print("*** recurse sudoku")
-            for position, element in filter(lambda x: len(x[1]) > 1, enumerate(sudoku.board)):
-                trydoku = copy.deepcopy(sudoku.board)
-                for v in element:
-                    sudoku.board[position] = {v}
-                    solve_sudoku(sudoku)
-                    if not cursedoku(sudoku):
-                        sudoku.board = copy.deepcopy(trydoku)
-                    else:
-                        return True
+            if depth < 3:
+                print(f"*** recurse sudoku, depth: {depth}")
+                for position, element in filter(lambda x: len(x[1]) > 1, enumerate(sudoku.board)):
+                    trydoku = copy.deepcopy(sudoku.board)
+                    for v in element:
+                        sudoku.board[position] = {v}
+                        solve_sudoku(sudoku)
+                        if not cursedoku(sudoku, depth=depth + 1):
+                            sudoku.board = copy.deepcopy(trydoku)
+                        else:
+                            return True
+            else:
+                return False
     else:
         return False
 
 
 def main():
     sudoku = SudokuBoard()
-    load_sudoku("sudoku2.txt", sudoku)
+    load_sudoku("sudoku7.txt", sudoku)
     print_sudoku(sudoku)
     solve_sudoku(sudoku)
     cursedoku(sudoku)
-    print(sudoku.valid())
+    print(f"Sudoku is valid: {sudoku.valid()}")
     print_sudoku(sudoku)
 
 
