@@ -104,7 +104,7 @@ def cursedoku(sudoku: SudokuBoard, depth=0):
         if sudoku.length() == 81:
             return True
         else:
-            if depth < 3:
+            if depth < 5:
                 print(f"*** recurse sudoku, depth: {depth}")
                 for position, element in filter(lambda x: len(x[1]) > 1, enumerate(sudoku.board)):
                     trydoku = copy.deepcopy(sudoku.board)
@@ -113,6 +113,8 @@ def cursedoku(sudoku: SudokuBoard, depth=0):
                         solve_sudoku(sudoku)
                         if not cursedoku(sudoku, depth=depth + 1):
                             sudoku.board = copy.deepcopy(trydoku)
+                            if depth > 0:
+                                return False
                         else:
                             return True
             else:
