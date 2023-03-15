@@ -14,14 +14,14 @@ class SudokuBoard:
     def valid(self):
         for pos, element in enumerate(self.board):
             if element == set():
-                print("Cell is empty at Board {0}".format(pos))
+                # print("Cell is empty at Board {0}".format(pos))
                 return False
             if element.issubset({"1", "2", "3", "4", "5", "6", "7", "8", "9"}) is False:
-                print("Invalid cell. position: {0} content: {1}".format(pos, element))
+                # print("Invalid cell. position: {0} content: {1}".format(pos, element))
                 return False
             if len(element) == 1:
                 if element in [self.board[x] for x in neighbor(pos=pos)["all"]]:
-                    print("Find duplicate {0}".format(element))
+                    # print("Find duplicate {0}".format(element))
                     return False
         return True
 
@@ -77,10 +77,10 @@ def print_sudoku(sudoku: SudokuBoard):
 
 
 def solve_sudoku(sudoku: SudokuBoard):
-    print("solving sudoku")
+    # print("solving sudoku")
     checked = set()
     while sudoku.valid() and sudoku.length() < 81 and sudoku.length() > len(checked):
-        print(f"sudoku len: {sudoku.length()}")
+        # print(f"sudoku len: {sudoku.length()}")
         for position, element in filter(lambda x: len(x[1]) == 1, enumerate(sudoku.board)):
             for p in neighbor(position)["all"]:
                 sudoku.board[p] -= element
@@ -95,7 +95,7 @@ def solve_sudoku(sudoku: SudokuBoard):
                 for group in ["line", "square", "column"]:
                     for p in neighbor(pos=combo[0], match=combo[1])[group]:
                         sudoku.board[p].difference_update(element)
-        print_sudoku(sudoku)
+        # print_sudoku(sudoku)
     return sudoku.valid()
 
 
@@ -104,16 +104,19 @@ def cursedoku(sudoku: SudokuBoard, depth=0):
         if sudoku.length() == 81:
             return True
         else:
-            if depth < 5:
-                print(f"*** recurse sudoku, depth: {depth}")
-                for position, element in filter(lambda x: len(x[1]) > 1, enumerate(sudoku.board)):
+            if depth < 3:  # Try to guess a maximum of 3 elements
+                # print(f"*** recurse sudoku, depth: {depth}")
+                unknowns = list(filter(lambda x: len(x[1]) > 1, enumerate(sudoku.board)))
+                unknowns.sort(key=lambda x: len(x[1]))
+                for position, element in unknowns:
                     trydoku = copy.deepcopy(sudoku.board)
                     for v in element:
+                        # print(f"try value: {v} at position {position}")
                         sudoku.board[position] = {v}
                         solve_sudoku(sudoku)
                         if not cursedoku(sudoku, depth=depth + 1):
                             sudoku.board = copy.deepcopy(trydoku)
-                            if depth > 0:
+                            if depth > 1:  # fail fast: if the 3rd element is wrong, return false and change the 2nd
                                 return False
                         else:
                             return True
