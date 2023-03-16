@@ -9,10 +9,10 @@ class SudokuBoard:
     def __init__(self):
         self.board = [{"1", "2", "3", "4", "5", "6", "7", "8", "9"} for x in range(81)]
 
-    def length(self):
+    def length(self) -> int:
         return len(list(filter(lambda x: len(x) == 1, self.board)))
 
-    def valid(self):
+    def valid(self) -> bool:
         for pos, element in enumerate(self.board):
             if element == set():
                 # print("Cell is empty at Board {0}".format(pos))
@@ -27,7 +27,7 @@ class SudokuBoard:
         return True
 
 
-def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
+def load_sudoku(sudoku_file: str, sudoku: SudokuBoard) -> bool:
     try:
         with open(sudoku_file, "r") as f:
             for pos, c in enumerate(f.read()):
@@ -46,7 +46,7 @@ def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
     return sudoku.valid()
 
 
-def neighbor(pos: int, match=None):
+def neighbor(pos: int, match=None) -> bool:
     line = [x for x in range(9 * (pos // 9), 9 * (pos // 9) + 9) if x != pos]
     column = [x for x in range(pos % 9, 81, 9) if x != pos]
     square = [x for x in range(81) if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3 and x != pos]
@@ -66,7 +66,7 @@ def neighbor(pos: int, match=None):
         }
 
 
-def print_sudoku(sudoku: SudokuBoard):
+def print_sudoku(sudoku: SudokuBoard) -> bool:
     print("+---+---+---+")
     for p in range(81):
         if p % 3 == 0:
@@ -87,7 +87,7 @@ def print_sudoku(sudoku: SudokuBoard):
     return True
 
 
-def solve_sudoku(sudoku: SudokuBoard):
+def solve_sudoku(sudoku: SudokuBoard) -> bool:
     # print("solving sudoku")
     checked = set()
     while sudoku.valid() and sudoku.length() < 81 and sudoku.length() > len(checked):
@@ -110,7 +110,7 @@ def solve_sudoku(sudoku: SudokuBoard):
     return sudoku.valid()
 
 
-def cursedoku(sudoku: SudokuBoard, depth=0):
+def cursedoku(sudoku: SudokuBoard, depth=0) -> bool:
     if sudoku.valid():
         if sudoku.length() == 81:
             return True
