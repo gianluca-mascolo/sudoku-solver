@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import argparse
 import copy
 from functools import reduce
 from itertools import combinations
@@ -27,11 +28,21 @@ class SudokuBoard:
 
 
 def load_sudoku(sudoku_file: str, sudoku: SudokuBoard):
-    with open(sudoku_file, "r") as f:
-        for pos, c in enumerate(f.read()):
-            if pos - pos // 10 < 81 and c in {"1", "2", "3", "4", "5", "6", "7", "8", "9"}:
-                sudoku.board[pos - pos // 10] = {c}
-    f.closed
+    try:
+        with open(sudoku_file, "r") as f:
+            for pos, c in enumerate(f.read()):
+                if pos - pos // 10 < 81 and c in {"1", "2", "3", "4", "5", "6", "7", "8", "9"}:
+                    sudoku.board[pos - pos // 10] = {c}
+        f.closed
+    except IOError as e:
+        print(f"Input file error: {e}")
+        return False
+    if sudoku.length() == 0:
+        print("Malformed input file")
+        return False
+    if sudoku.valid() is False:
+        print("Sudoku is not valid in input file")
+        return False
     return sudoku.valid()
 
 
@@ -127,13 +138,16 @@ def cursedoku(sudoku: SudokuBoard, depth=0):
 
 
 def main():
+    parser = argparse.ArgumentParser(prog="sudoku", description="Solve sudoku")
+    parser.add_argument("-s", "--sudoku-file", help="Path to sudoku input file", type=str, required=True)
+    args = parser.parse_args()
     sudoku = SudokuBoard()
-    load_sudoku("sudoku7.txt", sudoku)
-    print_sudoku(sudoku)
-    solve_sudoku(sudoku)
-    cursedoku(sudoku)
-    print(f"Sudoku is valid: {sudoku.valid()}")
-    print_sudoku(sudoku)
+    if load_sudoku(args.sudoku_file, sudoku):
+        print_sudoku(sudoku)
+        solve_sudoku(sudoku)
+        cursedoku(sudoku)
+        print(f"Sudoku is valid: {sudoku.valid()}")
+        print_sudoku(sudoku)
 
 
 if __name__ == "__main__":
