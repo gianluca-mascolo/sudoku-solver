@@ -6,19 +6,6 @@ from textual.widgets import Static
 class SudokuCell(Static):
     """Display Sudoku cell."""
 
-    # def __init__(self, *args, **kwargs):
-    #     self.id=1
-    #     self.name="xx"
-    # #pos = self.id
-    # #pos = name
-    DEFAULT_CSS = """
-    SudokuCell {{
-        height: {0};
-    }}
-    """.format(
-        "1"
-    )
-
     def on_mount(self) -> None:
         self.render()
 
@@ -26,13 +13,24 @@ class SudokuCell(Static):
 class SudokuApp(App):
     CSS = """
     Screen {
-        align: center middle;
+        align: left top;
+        layout: grid;
+        grid-size: 3 3;
+        grid-gutter: 1;
+        grid-rows: 1fr;
+        grid-columns: 1fr;
+    }
+    .cell {
+    height: 3;
+    width: 3;
+    border: solid green;
     }
     """
+    board = list(range(9))
 
     def compose(self) -> ComposeResult:
-        for x in range(2):
-            yield SudokuCell(id=f"cell{x}", renderable="X", name=f"{x}")
+        for p, v in enumerate(self.board):
+            yield SudokuCell(id=f"cell{p}", renderable=f"{v}", name=f"{p}", classes="cell")
 
 
 def main():
