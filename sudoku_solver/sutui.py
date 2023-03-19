@@ -51,7 +51,8 @@ class SudokuApp(App):
     }
     """
     BINDINGS = [("s,S", "solve", "Solve"), ("c,C", "clear", "Clear"), ("q,Q", "quit", "Quit")]
-    board = list(map(lambda x: x % 9 + 1, range(81)))
+    # board = list(map(lambda x: x % 9 + 1, range(81)))
+    board = ["" for x in range(81)]
     # position = 0
     sudoku_grid = [SudokuCell(id=f"cell{p}", renderable=f"{v}", name=f"{p}", classes="cell") for p, v in enumerate(board)]
     sudoku_grid[0].add_class("selected")
