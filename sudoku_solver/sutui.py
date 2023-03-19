@@ -69,7 +69,7 @@ class SudokuApp(App):
         key = event.key
         p = position
         board = self.board
-        if key in list(map(lambda c: str(c), range(1, 9))):
+        if key in list(map(lambda c: str(c), range(1, 10))):
             board[p] = key
         else:
             board[p] = ""
