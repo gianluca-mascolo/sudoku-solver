@@ -1,153 +1,117 @@
 #!/usr/bin/env python3
-import argparse
-import copy
-from functools import reduce
-from itertools import combinations
+from textual import events
+from textual.app import App, ComposeResult
+from textual.widgets import Footer, Header, Static
+
+from sudoku_solver.sudokulib import SudokuBoard, cursedoku, solve_sudoku
+
+position = 0
 
 
-class SudokuBoard:
-    def __init__(self):
-        self.board = [{"1", "2", "3", "4", "5", "6", "7", "8", "9"} for x in range(81)]
+class SudokuCell(Static):
+    """Display Sudoku cell."""
 
-    def length(self) -> int:
-        return len(list(filter(lambda x: len(x) == 1, self.board)))
+    def on_mount(self) -> None:
+        self.render()
 
-    def valid(self) -> bool:
-        for pos, element in enumerate(self.board):
-            if element == set():
-                # print("Cell is empty at Board {0}".format(pos))
-                return False
-            if element.issubset({"1", "2", "3", "4", "5", "6", "7", "8", "9"}) is False:
-                # print("Invalid cell. position: {0} content: {1}".format(pos, element))
-                return False
-            if len(element) == 1:
-                if element in [self.board[x] for x in neighbor(pos=pos)["all"]]:
-                    # print("Find duplicate {0}".format(element))
-                    return False
-        return True
+    def on_click(self) -> None:
+        global position
+        self.add_class("selected")
+        position = int(self.name)
+        # self.position=int(self.name)
 
 
-def load_sudoku(sudoku_file: str, sudoku: SudokuBoard) -> bool:
-    try:
-        with open(sudoku_file, "r") as f:
-            for pos, c in enumerate(f.read()):
-                if pos - pos // 10 < 81 and c in {"1", "2", "3", "4", "5", "6", "7", "8", "9"}:
-                    sudoku.board[pos - pos // 10] = {c}
-        f.closed
-    except IOError as e:
-        print(f"Input file error: {e}")
-        return False
-    if sudoku.length() == 0:
-        print("Malformed input file")
-        return False
-    if sudoku.valid() is False:
-        print("Sudoku is not valid in input file")
-        return False
-    return sudoku.valid()
-
-
-def neighbor(pos: int, match=None) -> bool:
-    line = [x for x in range(9 * (pos // 9), 9 * (pos // 9) + 9) if x != pos]
-    column = [x for x in range(pos % 9, 81, 9) if x != pos]
-    square = [x for x in range(81) if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3 and x != pos]
-    if not match:
-        return {
-            "line": line,
-            "column": column,
-            "square": square,
-            "all": list(set(line + column + square)),
-        }
-    else:
-        return {
-            "line": [x for x in line if match in line and x != match],
-            "column": [x for x in column if match in column and x != match],
-            "square": [x for x in square if match in square and x != match],
-            "all": [],
-        }
-
-
-def print_sudoku(sudoku: SudokuBoard) -> bool:
-    print("+---+---+---+")
-    for p in range(81):
-        if p % 3 == 0:
-            if p % 9 == 0 and p != 0:
-                print("|")
-                if p % 27 == 0 and p != 0:
-                    print("+---+---+---+")
-                print("|", end="")
-            else:
-                print("|", end="")
-        if len(sudoku.board[p]) == 1:
-            print(str(next(iter(sudoku.board[p]))), end="")
+class SudokuApp(App):
+    CSS = """
+    Screen {
+        align: left top;
+        layout: grid;
+        grid-size: 9 10;
+        grid-gutter: 0 0;
+        grid-rows: 2;
+        grid-columns: 3;
+        padding: 0;
+    }
+    .cell {
+    height: 2;
+    width: 3;
+    border-left: solid blue;
+    border-top: solid blue;
+    }
+    .selected {
+    height: 2;
+    width: 3;
+    border-left: solid yellow;
+    border-top: solid yellow;
+    }
+    #filler {
+    column-span: 9;
+    height: 100%;
+    width: 100%;
+    content-align: center middle;
+    border: none
+    }
+    """
+    BINDINGS = [("s,S", "solve", "Solve"), ("c,C", "clear", "Clear"), ("q,Q", "quit", "Quit")]
+    sudoku = SudokuBoard()
+    sudoku_grid = []
+    for p, v in enumerate(sudoku.board):
+        if len(v) == 1:
+            sudoku_grid.append(SudokuCell(id=f"cell{p}", renderable=f"{list(v)[0]}", name=f"{p}", classes="cell"))
         else:
-            print("_", end="")
-    print("|")
-    print("+---+---+---+")
+            sudoku_grid.append(SudokuCell(id=f"cell{p}", renderable="", name=f"{p}", classes="cell"))
+    sudoku_grid[0].add_class("selected")
 
-    return True
+    def compose(self) -> ComposeResult:
+        yield Header(show_clock=True)
+        yield Footer()
 
+        for p in range(81):
+            yield self.sudoku_grid[p]
+        yield Static("", classes="cell", id="filler")
 
-def solve_sudoku(sudoku: SudokuBoard) -> bool:
-    # print("solving sudoku")
-    checked = set()
-    while sudoku.valid() and sudoku.length() < 81 and sudoku.length() > len(checked):
-        # print(f"sudoku len: {sudoku.length()}")
-        for position, element in filter(lambda x: len(x[1]) == 1, enumerate(sudoku.board)):
-            for p in neighbor(position)["all"]:
-                sudoku.board[p] -= element
-                checked.add(position)
-        for position, element in filter(lambda x: len(x[1]) > 1, enumerate(sudoku.board)):
-            for group in ["line", "square", "column"]:
-                if alone := element - reduce(lambda a, b: a | b, map(lambda x: sudoku.board[x], neighbor(position)[group])):
-                    sudoku.board[position] = alone
-        for position, element in (twins := list(filter(lambda x: len(x[1]) == 2, enumerate(sudoku.board)))):
-            twins_position = set([x[0] for x in twins if x[1] == element])
-            for combo in combinations(twins_position, 2):
-                for group in ["line", "square", "column"]:
-                    for p in neighbor(pos=combo[0], match=combo[1])[group]:
-                        sudoku.board[p].difference_update(element)
-        # print_sudoku(sudoku)
-    return sudoku.valid()
-
-
-def cursedoku(sudoku: SudokuBoard, depth=0) -> bool:
-    if sudoku.valid():
-        if sudoku.length() == 81:
-            return True
-        else:
-            if depth < 3:  # Try to guess a maximum of 3 elements
-                # print(f"*** recurse sudoku, depth: {depth}")
-                unknowns = list(filter(lambda x: len(x[1]) > 1, enumerate(sudoku.board)))
-                unknowns.sort(key=lambda x: len(x[1]))
-                for position, element in unknowns:
-                    trydoku = copy.deepcopy(sudoku.board)
-                    for v in element:
-                        # print(f"try value: {v} at position {position}")
-                        sudoku.board[position] = {v}
-                        solve_sudoku(sudoku)
-                        if not cursedoku(sudoku, depth=depth + 1):
-                            sudoku.board = copy.deepcopy(trydoku)
-                            if depth > 1:  # fail fast: if the 3rd element is wrong, return false and change the 2nd
-                                return False
-                        else:
-                            return True
+    def on_key(self, event: events.Key) -> None:
+        global position
+        key = event.key
+        currentvalue = self.sudoku.board[position]
+        self.sudoku_grid[position].remove_class("selected")
+        if key in list(map(lambda c: str(c), range(1, 10))):
+            self.sudoku.board[position] = {key}
+            if self.sudoku.valid():
+                self.sudoku_grid[position].update(key)
+                position = (position + 1) % 81
             else:
-                return False
-    else:
-        return False
+                self.sudoku.board[position] = currentvalue
+        elif key == "x" or key == "X" or key == "*":
+            self.sudoku.board[position] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
+            self.sudoku_grid[position].update("")
+            position = (position + 1) % 81
+        self.sudoku_grid[position].add_class("selected")
+
+    def action_quit(self) -> None:
+        self.app.exit()
+
+    def action_solve(self) -> None:
+        solve_sudoku(self.sudoku)
+        cursedoku(self.sudoku)
+        for p, v in enumerate(self.sudoku.board):
+            if len(v) == 1:
+                self.sudoku_grid[p].update(str(list(v)[0]))
+
+    def action_clear(self) -> None:
+        global position
+        for x in range(81):
+            self.sudoku.board[x] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
+            self.sudoku_grid[x].update("")
+        self.sudoku_grid[position].remove_class("selected")
+        position = 0
+        self.sudoku_grid[0].add_class("selected")
 
 
 def main():
-    parser = argparse.ArgumentParser(prog="sudoku", description="Solve sudoku")
-    parser.add_argument("-s", "--sudoku-file", help="Path to sudoku input file", type=str, required=True)
-    args = parser.parse_args()
-    sudoku = SudokuBoard()
-    if load_sudoku(args.sudoku_file, sudoku):
-        print_sudoku(sudoku)
-        solve_sudoku(sudoku)
-        cursedoku(sudoku)
-        print(f"Sudoku is valid: {sudoku.valid()}")
-        print_sudoku(sudoku)
+    app = SudokuApp()
+    app.run()
+    return True
 
 
 if __name__ == "__main__":

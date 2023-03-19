@@ -1,4 +1,4 @@
-from sudoku_solver.sudoku import SudokuBoard, load_sudoku
+from sudoku_solver.sudokulib import SudokuBoard, load_sudoku
 
 
 def test_valid():
