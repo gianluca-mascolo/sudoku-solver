@@ -31,4 +31,3 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
 sudoku = "sudoku_solver.sudoku:main"
-sutui = "sudoku_solver.sutui:main"
