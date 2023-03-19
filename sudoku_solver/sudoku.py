@@ -82,7 +82,7 @@ class SudokuApp(App):
                 position = (position + 1) % 81
             else:
                 self.sudoku.board[position] = currentvalue
-        elif key == "x" or key == "X" or key == "*":
+        elif key == "x" or key == "X":
             self.sudoku.board[position] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
             self.sudoku_grid[position].update("")
             position = (position + 1) % 81
