@@ -3,12 +3,20 @@ from textual import events
 from textual.app import App, ComposeResult
 from textual.widgets import Footer, Header, Static
 
+position = 0
+
 
 class SudokuCell(Static):
     """Display Sudoku cell."""
 
     def on_mount(self) -> None:
         self.render()
+
+    def on_click(self) -> None:
+        global position
+        self.add_class("selected")
+        position = int(self.name)
+        # self.position=int(self.name)
 
 
 class SudokuApp(App):
@@ -44,7 +52,7 @@ class SudokuApp(App):
     """
     BINDINGS = [("s,S", "solve", "Solve"), ("c,C", "clear", "Clear"), ("q,Q", "quit", "Quit")]
     board = list(map(lambda x: x % 9 + 1, range(81)))
-    position = 0
+    # position = 0
     sudoku_grid = [SudokuCell(id=f"cell{p}", renderable=f"{v}", name=f"{p}", classes="cell") for p, v in enumerate(board)]
     sudoku_grid[0].add_class("selected")
 
@@ -57,8 +65,9 @@ class SudokuApp(App):
         yield Static("", classes="cell", id="filler")
 
     def on_key(self, event: events.Key) -> None:
+        global position
         key = event.key
-        p = self.position
+        p = position
         board = self.board
         if key in list(map(lambda c: str(c), range(1, 9))):
             board[p] = key
@@ -66,9 +75,8 @@ class SudokuApp(App):
             board[p] = ""
         self.sudoku_grid[p].remove_class("selected")
         self.sudoku_grid[p].update(board[p])
-        self.position = (p + 1) % 81
-        self.sudoku_grid[self.position].add_class("selected")
-        return True
+        position = (p + 1) % 81
+        self.sudoku_grid[position].add_class("selected")
 
     def action_quit(self) -> None:
         self.app.exit()
