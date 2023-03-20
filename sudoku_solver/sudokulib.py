@@ -117,6 +117,8 @@ def cursedoku(sudoku: SudokuBoard, depth=0) -> bool:
     if sudoku.valid():
         if sudoku.length() == 81:
             return True
+        elif sudoku.length() < 21:
+            return False
         else:
             if depth < 3:  # Try to guess a maximum of 3 elements
                 # print(f"*** recurse sudoku, depth: {depth}")

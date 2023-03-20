@@ -56,7 +56,7 @@ class SudokuApp(App):
     Screen {
         align: left top;
         layout: grid;
-        grid-size: 9 10;
+        grid-size: 9 11;
         grid-gutter: 0 0;
         grid-rows: 2;
         grid-columns: 3;
@@ -76,6 +76,7 @@ class SudokuApp(App):
     }
     #filler {
     column-span: 9;
+    row-span: 2;
     height: 100%;
     width: 100%;
     content-align: center middle;
@@ -99,6 +100,7 @@ class SudokuApp(App):
         else:
             sudoku_grid.append(SudokuCell(id=f"cell{p}", renderable="", name=f"{p}", classes="cell"))
     sudoku_grid[0].add_class("selected")
+    message = Static("'1-9' insert, 'x' delete", classes="cell", id="filler")
 
     def compose(self) -> ComposeResult:
         global sudoku_grid
@@ -107,7 +109,7 @@ class SudokuApp(App):
 
         for p in range(81):
             yield sudoku_grid[p]
-        yield Static("", classes="cell", id="filler")
+        yield self.message
 
     def on_key(self, event: events.Key) -> None:
         global sudoku_grid
@@ -150,6 +152,7 @@ class SudokuApp(App):
         sudoku_grid[position].remove_class("selected")
         position = 0
         sudoku_grid[0].add_class("selected")
+        self.message.update("'1-9' insert, 'x' delete")
 
 
 def main():
