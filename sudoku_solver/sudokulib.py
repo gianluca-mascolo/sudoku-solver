@@ -26,6 +26,9 @@ class SudokuBoard:
                     return False
         return True
 
+    def clear(self) -> None:
+        self.board = [{"1", "2", "3", "4", "5", "6", "7", "8", "9"} for x in range(81)]
+
 
 def load_sudoku(sudoku_file: str, sudoku: SudokuBoard) -> bool:
     try:

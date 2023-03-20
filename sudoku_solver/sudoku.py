@@ -4,17 +4,37 @@ from textual.app import App, ComposeResult
 from textual.screen import Screen
 from textual.widgets import DirectoryTree, Footer, Header, Static
 
-from sudoku_solver.sudokulib import SudokuBoard, cursedoku, solve_sudoku
+from sudoku_solver.sudokulib import SudokuBoard, cursedoku, load_sudoku, solve_sudoku  # NOQA
 
 position = 0
 sudoku_grid = []
 
 
 class SudokuFile(Screen):
-    BINDINGS = [("escape", "app.pop_screen", "Pop screen")]
+    BINDINGS = [("escape", "app.pop_screen", "Return")]
+
+    def __init__(self, sudoku: SudokuBoard):
+        self.sudoku = sudoku
+        super().__init__()
 
     def compose(self) -> ComposeResult:
         yield DirectoryTree("./samples/", classes="cell", id="loader")
+
+    def on_directory_tree_file_selected(self, event: DirectoryTree.FileSelected) -> None:
+        event.stop()
+        self.sudoku.clear()
+        if load_sudoku(str(event.path), self.sudoku):
+            for p, v in enumerate(self.sudoku.board):
+                if len(v) == 1:
+                    sudoku_grid[p].update(str(list(v)[0]))
+                else:
+                    sudoku_grid[p].update("")
+        else:
+            self.sudoku.clear()
+            for p in range(81):
+                sudoku_grid[p].update("")
+        self.app.pop_screen()
+        return None
 
 
 class SudokuCell(Static):
@@ -29,7 +49,6 @@ class SudokuCell(Static):
         sudoku_grid[position].remove_class("selected")
         self.add_class("selected")
         position = int(self.name)
-        # self.position=int(self.name)
 
 
 class SudokuApp(App):
@@ -71,8 +90,9 @@ class SudokuApp(App):
     }
     """
     BINDINGS = [("s,S", "solve", "Solve"), ("c,C", "clear", "Clear"), ("l,L", "push_screen('sudokufile')", "Load"), ("q,Q", "quit", "Quit")]
-    SCREENS = {"sudokufile": SudokuFile()}
     sudoku = SudokuBoard()
+    SCREENS = {"sudokufile": SudokuFile(sudoku=sudoku)}
+
     for p, v in enumerate(sudoku.board):
         if len(v) == 1:
             sudoku_grid.append(SudokuCell(id=f"cell{p}", renderable=f"{list(v)[0]}", name=f"{p}", classes="cell"))
@@ -112,24 +132,24 @@ class SudokuApp(App):
         self.app.exit()
 
     def action_solve(self) -> None:
+        global sudoku_grid
         solve_sudoku(self.sudoku)
         cursedoku(self.sudoku)
         for p, v in enumerate(self.sudoku.board):
             if len(v) == 1:
-                self.sudoku_grid[p].update(str(list(v)[0]))
+                sudoku_grid[p].update(str(list(v)[0]))
+            else:
+                sudoku_grid[p].update("")
 
     def action_clear(self) -> None:
         global sudoku_grid
         global position
         for x in range(81):
             self.sudoku.board[x] = {"1", "2", "3", "4", "5", "6", "7", "8", "9"}
-            self.sudoku_grid[x].update("")
-        self.sudoku_grid[position].remove_class("selected")
+            sudoku_grid[x].update("")
+        sudoku_grid[position].remove_class("selected")
         position = 0
-        self.sudoku_grid[0].add_class("selected")
-
-    def action_load(self) -> None:
-        return None
+        sudoku_grid[0].add_class("selected")
 
 
 def main():
