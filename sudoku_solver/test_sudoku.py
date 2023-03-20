@@ -98,5 +98,5 @@ def test_valid():
 
 def test_load():
     sudoku = SudokuBoard()
-    r = load_sudoku("sudoku1.txt", sudoku)
+    r = load_sudoku("samples/sudoku1.txt", sudoku)
     assert r
