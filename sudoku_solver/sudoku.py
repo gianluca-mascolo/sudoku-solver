@@ -1,12 +1,20 @@
 #!/usr/bin/env python3
 from textual import events
 from textual.app import App, ComposeResult
-from textual.widgets import Footer, Header, Static
+from textual.screen import Screen
+from textual.widgets import DirectoryTree, Footer, Header, Static
 
 from sudoku_solver.sudokulib import SudokuBoard, cursedoku, solve_sudoku
 
 position = 0
 sudoku_grid = []
+
+
+class SudokuFile(Screen):
+    BINDINGS = [("escape", "app.pop_screen", "Pop screen")]
+
+    def compose(self) -> ComposeResult:
+        yield DirectoryTree("./samples/", classes="cell", id="loader")
 
 
 class SudokuCell(Static):
@@ -54,8 +62,16 @@ class SudokuApp(App):
     content-align: center middle;
     border: none
     }
+    #loader {
+    row-span: 9;
+    column-span: 9;
+    content-align: center middle;
+    width: 100%;
+    height: 100%;
+    }
     """
-    BINDINGS = [("s,S", "solve", "Solve"), ("c,C", "clear", "Clear"), ("q,Q", "quit", "Quit")]
+    BINDINGS = [("s,S", "solve", "Solve"), ("c,C", "clear", "Clear"), ("l,L", "push_screen('sudokufile')", "Load"), ("q,Q", "quit", "Quit")]
+    SCREENS = {"sudokufile": SudokuFile()}
     sudoku = SudokuBoard()
     for p, v in enumerate(sudoku.board):
         if len(v) == 1:
@@ -111,6 +127,9 @@ class SudokuApp(App):
         self.sudoku_grid[position].remove_class("selected")
         position = 0
         self.sudoku_grid[0].add_class("selected")
+
+    def action_load(self) -> None:
+        return None
 
 
 def main():
