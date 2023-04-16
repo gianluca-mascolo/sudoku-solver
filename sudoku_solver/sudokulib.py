@@ -109,6 +109,18 @@ def solve_sudoku(sudoku: SudokuBoard) -> bool:
                 # https://sudoku.com/sudoku-rules/hidden-singles/
                 if alone := element - reduce(lambda a, b: a | b, map(lambda x: sudoku.board[x], neighbor(position)[group])):
                     sudoku.board[position] = alone
+                # https://sudoku.com/sudoku-rules/hidden-pairs/
+                for combo in combinations(element, 2):
+                    neigh = map(lambda x: sudoku.board[x], neighbor(position)[group])
+                    combo_list = list(map(lambda x: set(combo).issubset(x), neigh))
+                    combo_count = sum(combo_list)
+                    c1_count = sum(list(map(lambda x: set(combo[0]).issubset(x), neigh)))
+                    c2_count = sum(list(map(lambda x: set(combo[1]).issubset(x), neigh)))
+                    if combo_count == 1 and c1_count == 1 and c2_count == 1:
+                        sudoku.board[position] = set(combo)
+                        combo_twin_position = neighbor(position)[group][combo_list.index(True)]
+                        sudoku.board[combo_twin_position] = set(combo)
+
         # https://sudoku.com/sudoku-rules/obvious-pairs/
         # For every cell that contains pair...
         for position, element in (twins := list(filter(lambda x: len(x[1]) == 2, enumerate(sudoku.board)))):
