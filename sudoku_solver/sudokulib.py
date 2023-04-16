@@ -53,7 +53,7 @@ def neighbor(pos: int, match=None) -> bool:
     line = [x for x in range(9 * (pos // 9), 9 * (pos // 9) + 9) if x != pos]
     column = [x for x in range(pos % 9, 81, 9) if x != pos]
     square = [x for x in range(81) if 3 * (x // 9 // 3) + x // 3 % 3 == 3 * (pos // 9 // 3) + pos // 3 % 3 and x != pos]
-    if not match:
+    if match is None:
         return {
             "line": line,
             "column": column,
@@ -62,9 +62,9 @@ def neighbor(pos: int, match=None) -> bool:
         }
     else:
         return {
-            "line": [x for x in line if match in line and x != match],
-            "column": [x for x in column if match in column and x != match],
-            "square": [x for x in square if match in square and x != match],
+            "line": [x for x in line if set(match).issubset(set(line)) and x not in set(match)],
+            "column": [x for x in column if set(match).issubset(set(column)) and x not in set(match)],
+            "square": [x for x in square if set(match).issubset(set(square)) and x not in set(match)],
             "all": [],
         }
 
@@ -90,25 +90,33 @@ def print_sudoku(sudoku: SudokuBoard) -> bool:
     return True
 
 
+# Different solving rules can be found at:
+# https://sudoku.com/sudoku-rules/
 def solve_sudoku(sudoku: SudokuBoard) -> bool:
     # print("solving sudoku")
     checked = set()
     while sudoku.valid() and sudoku.length() < 81 and sudoku.length() > len(checked):
         # print(f"sudoku len: {sudoku.length()}")
+        # Every cell that contain only one number must be eliminated from its neighbors
         for position, element in filter(lambda x: len(x[1]) == 1, enumerate(sudoku.board)):
             for p in neighbor(position)["all"]:
                 sudoku.board[p] -= element
                 checked.add(position)
+        # For every cell that contains more than one number...
         for position, element in filter(lambda x: len(x[1]) > 1, enumerate(sudoku.board)):
             for group in ["line", "square", "column"]:
+                # ... if that number it's not present on any neighbor, than it must be in that cell.
+                # https://sudoku.com/sudoku-rules/hidden-singles/
                 if alone := element - reduce(lambda a, b: a | b, map(lambda x: sudoku.board[x], neighbor(position)[group])):
                     sudoku.board[position] = alone
+        # https://sudoku.com/sudoku-rules/obvious-pairs/
+        # For every cell that contains pair...
         for position, element in (twins := list(filter(lambda x: len(x[1]) == 2, enumerate(sudoku.board)))):
-            twins_position = set([x[0] for x in twins if x[1] == element])
-            for combo in combinations(twins_position, 2):
+            twins_position = set([x[0] for x in twins if x[1] == element])  # ... get position of all pairs that math cell ...
+            for combo in combinations(twins_position, 2):  # ... combine all position of my pairs in couples ...
                 for group in ["line", "square", "column"]:
-                    for p in neighbor(pos=combo[0], match=combo[1])[group]:
-                        sudoku.board[p].difference_update(element)
+                    for p in neighbor(pos=combo[0], match=[combo[1]])[group]:  # ... all pair couples that are neighbors ...
+                        sudoku.board[p].difference_update(element)  # ... must be eliminated from all other cells in neighborhood.
         # print_sudoku(sudoku)
     return sudoku.valid()
 
