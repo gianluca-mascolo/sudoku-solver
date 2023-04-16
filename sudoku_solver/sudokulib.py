@@ -97,7 +97,7 @@ def solve_sudoku(sudoku: SudokuBoard) -> bool:
     checked = set()
     while sudoku.valid() and sudoku.length() < 81 and sudoku.length() > len(checked):
         # print(f"sudoku len: {sudoku.length()}")
-        # Every cell that contain only one number must be eliminated from its neighbors
+        # For every cell that contain only one number, erase that number from cell neighbors
         for position, element in filter(lambda x: len(x[1]) == 1, enumerate(sudoku.board)):
             for p in neighbor(position)["all"]:
                 sudoku.board[p] -= element
@@ -109,6 +109,7 @@ def solve_sudoku(sudoku: SudokuBoard) -> bool:
                 # https://sudoku.com/sudoku-rules/hidden-singles/
                 if alone := element - reduce(lambda a, b: a | b, map(lambda x: sudoku.board[x], neighbor(position)[group])):
                     sudoku.board[position] = alone
+                # ... if a pair of numbers in the cell it's present only once in its neighbors, they form a pair.
                 # https://sudoku.com/sudoku-rules/hidden-pairs/
                 for combo in combinations(element, 2):
                     neigh = map(lambda x: sudoku.board[x], neighbor(position)[group])
