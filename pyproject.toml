@@ -148,8 +148,3 @@ exclude_lines = [
     "if __name__ == .__main__.:",
     "if TYPE_CHECKING:",
 ]
-
-[tool.flake8]
-max-line-length = 200
-extend-exclude = ["old", ".git", ".mypy_cache", ".pytest_cache", "__pycache__", ".venv", "build", "dist"]
-ignore = ["E203", "W503"]  # E203 and W503 are incompatible with black

@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import sys
+
 from textual import events
 from textual.app import App, ComposeResult
 from textual.screen import Screen
@@ -158,7 +160,6 @@ class SudokuApp(App):
 
 
 def main():
-    import sys
     app = SudokuApp()
     exit_code = app.run()
     sys.exit(exit_code if exit_code is not None else 0)
