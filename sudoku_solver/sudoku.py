@@ -130,7 +130,7 @@ class SudokuApp(App):
         sudoku_grid[position].add_class("selected")
 
     def action_quit(self) -> None:
-        self.app.exit()
+        self.app.exit(return_code=0)
 
     def action_solve(self) -> None:
         global sudoku_grid
@@ -158,9 +158,10 @@ class SudokuApp(App):
 
 
 def main():
+    import sys
     app = SudokuApp()
-    app.run()
-    return True
+    exit_code = app.run()
+    sys.exit(exit_code if exit_code is not None else 0)
 
 
 if __name__ == "__main__":
