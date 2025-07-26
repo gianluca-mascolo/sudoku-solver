@@ -1,32 +1,155 @@
-[tool.poetry]
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[project]
 name = "sudoku-solver"
 version = "0.1.0"
-description = "Sudoku solver"
-authors = ["Gianluca Mascolo <gianluca@gurutech.it>"]
-license = "GPL-3.0-or-later"
-homepage = "https://github.com/gianluca-mascolo/sudoku-solver/"
-repository = "https://github.com/gianluca-mascolo/sudoku-solver/"
+description = "A Python-based Sudoku solver with an interactive text-based user interface"
 readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "GPL-3.0-or-later"}
+authors = [
+    {name = "Gianluca Mascolo", email = "gianluca@gurutech.it"}
+]
+maintainers = [
+    {name = "Gianluca Mascolo", email = "gianluca@gurutech.it"}
+]
+keywords = ["sudoku", "puzzle", "solver", "tui", "textual"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Games/Entertainment :: Puzzle Games",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
+]
+dependencies = [
+    "textual>=5.0.1"
+]
+
+[project.urls]
+Homepage = "https://github.com/gianluca-mascolo/sudoku-solver/"
+Repository = "https://github.com/gianluca-mascolo/sudoku-solver/"
+Documentation = "https://github.com/gianluca-mascolo/sudoku-solver/blob/main/README.md"
+"Bug Tracker" = "https://github.com/gianluca-mascolo/sudoku-solver/issues"
+
+[project.scripts]
+sudoku = "sudoku_solver.sudoku:main"
+
+[project.optional-dependencies]
+dev = [
+    "black>=23.1.0",
+    "isort>=5.12.0",
+    "flake8>=6.0.0",
+    "pytest>=7.2.2",
+    "mypy>=1.0.0",
+    "pytest-cov>=4.0.0",
+    "pre-commit>=3.0.0"
+]
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0"
+]
+
+[tool.poetry]
 packages = [{include = "sudoku_solver"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 textual = "^5.0.1"
 
-
 [tool.poetry.group.dev.dependencies]
-isort = "^5.12.0"
 black = "^23.1.0"
+isort = "^5.12.0"
 flake8 = "^6.0.0"
 pytest = "^7.2.2"
+mypy = "^1.0.0"
+pytest-cov = "^4.0.0"
+pre-commit = "^3.0.0"
 
+[tool.poetry.group.docs]
+optional = true
+
+[tool.poetry.group.docs.dependencies]
+mkdocs = "^1.5.0"
+mkdocs-material = "^9.0.0"
+
+# Tool configurations
 [tool.black]
 line-length = 200
-extend-exclude = "old"
+target-version = ['py39', 'py310', 'py311', 'py312']
+extend-exclude = '''
+/(
+  old
+  | \.git
+  | \.mypy_cache
+  | \.pytest_cache
+  | __pycache__
+  | \.venv
+  | build
+  | dist
+)/
+'''
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.isort]
+profile = "black"
+line_length = 200
+multi_line_output = 7
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+skip = [".gitignore", ".venv", "old"]
 
-[tool.poetry.scripts]
-sudoku = "sudoku_solver.sudoku:main"
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["sudoku_solver"]
+python_files = ["test_*.py", "*_test.py"]
+addopts = [
+    "--strict-markers",
+    "--verbose",
+    "--color=yes",
+]
+
+[tool.mypy]
+python_version = "3.9"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+ignore_missing_imports = true
+
+[tool.coverage.run]
+source = ["sudoku_solver"]
+omit = ["*/test_*.py", "*/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+]
+
+[tool.flake8]
+max-line-length = 200
+extend-exclude = ["old", ".git", ".mypy_cache", ".pytest_cache", "__pycache__", ".venv", "build", "dist"]
+ignore = ["E203", "W503"]  # E203 and W503 are incompatible with black
