@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+import os
 import sys
 
 from textual import events
 from textual.app import App, ComposeResult
-from textual.screen import Screen
-from textual.widgets import DirectoryTree, Footer, Header, Static
+from textual.screen import ModalScreen, Screen
+from textual.validation import Function
+from textual.widgets import DirectoryTree, Footer, Header, Input, Static
 
 from sudoku_solver.sudokulib import SudokuBoard, cursedoku, load_sudoku, solve_sudoku  # NOQA
 
@@ -37,6 +39,53 @@ class SudokuFile(Screen):
                 sudoku_grid[p].update("")
         self.app.pop_screen()
         return None
+
+
+class SaveFile(ModalScreen):
+    CSS = """
+    SaveFile {
+        align: center middle;
+        layout: vertical;
+    }
+
+    .box {
+        height: auto;
+        width: auto;
+    }
+    """
+
+    BINDINGS = [("escape", "app.pop_screen", "Cancel")]
+
+    def __init__(self, sudoku: SudokuBoard):
+        self.sudoku = sudoku
+        super().__init__()
+
+    def on_input_submitted(self, event: Input.Submitted):
+        if event.validation_result.is_valid:
+            self.save_sudoku(event.value)
+            self.app.pop_screen()
+
+    def compose(self) -> ComposeResult:
+        yield Header()
+        yield Input(placeholder="Enter filename (without .txt)", classes="box", id="input", validators=[Function(self.validate_filename, "Invalid filename or file already exists")])
+        yield Footer()
+
+    def validate_filename(self, value: str) -> bool:
+        if not value or "/" in value or "\\" in value:
+            return False
+        filepath = os.path.join("samples", f"{value}.txt")
+        return not os.path.exists(filepath)
+
+    def save_sudoku(self, filename: str) -> None:
+        filepath = os.path.join("samples", f"{filename}.txt")
+        with open(filepath, "w") as f:
+            for i in range(81):
+                if len(self.sudoku.board[i]) == 1:
+                    f.write(str(list(self.sudoku.board[i])[0]))
+                else:
+                    f.write("*")
+                if (i + 1) % 9 == 0:
+                    f.write("\n")
 
 
 class SudokuCell(Static):
@@ -92,7 +141,7 @@ class SudokuApp(App):
     height: 100%;
     }
     """
-    BINDINGS = [("s,S", "solve", "Solve"), ("c,C", "clear", "Clear"), ("l,L", "load_file", "Load"), ("q,Q", "quit", "Quit")]
+    BINDINGS = [("s,S", "solve", "Solve"), ("c,C", "clear", "Clear"), ("l,L", "load_file", "Load"), ("w,W", "save_file", "Save"), ("q,Q", "quit", "Quit")]
     sudoku = SudokuBoard()
 
     for p, v in enumerate(sudoku.board):
@@ -157,6 +206,9 @@ class SudokuApp(App):
 
     def action_load_file(self) -> None:
         self.push_screen(SudokuFile(self.sudoku))
+
+    def action_save_file(self) -> None:
+        self.push_screen(SaveFile(self.sudoku))
 
 
 def main():
