@@ -53,7 +53,8 @@ poetry run sudoku   # Alternative: run directly via poetry
 
 3. **TUI Application** (`sudoku.py`): Interactive interface using Textual
    - Grid navigation with keyboard
-   - File loading from samples directory
+   - File loading from samples directory (L key)
+   - Save current puzzle to file (W key)
    - Real-time validation
    - Solve command integration
 
