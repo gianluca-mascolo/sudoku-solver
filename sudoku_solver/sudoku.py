@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import sys
+
 from textual import events
 from textual.app import App, ComposeResult
 from textual.screen import Screen
@@ -90,15 +92,14 @@ class SudokuApp(App):
     height: 100%;
     }
     """
-    BINDINGS = [("s,S", "solve", "Solve"), ("c,C", "clear", "Clear"), ("l,L", "push_screen('sudokufile')", "Load"), ("q,Q", "quit", "Quit")]
+    BINDINGS = [("s,S", "solve", "Solve"), ("c,C", "clear", "Clear"), ("l,L", "load_file", "Load"), ("q,Q", "quit", "Quit")]
     sudoku = SudokuBoard()
-    SCREENS = {"sudokufile": SudokuFile(sudoku=sudoku)}
 
     for p, v in enumerate(sudoku.board):
         if len(v) == 1:
-            sudoku_grid.append(SudokuCell(id=f"cell{p}", renderable=f"{list(v)[0]}", name=f"{p}", classes="cell"))
+            sudoku_grid.append(SudokuCell(f"{list(v)[0]}", id=f"cell{p}", name=f"{p}", classes="cell"))
         else:
-            sudoku_grid.append(SudokuCell(id=f"cell{p}", renderable="", name=f"{p}", classes="cell"))
+            sudoku_grid.append(SudokuCell("", id=f"cell{p}", name=f"{p}", classes="cell"))
     sudoku_grid[0].add_class("selected")
     message = Static("'1-9' insert, 'x' delete", classes="cell", id="filler")
 
@@ -131,7 +132,7 @@ class SudokuApp(App):
         sudoku_grid[position].add_class("selected")
 
     def action_quit(self) -> None:
-        self.app.exit()
+        self.app.exit(return_code=0)
 
     def action_solve(self) -> None:
         global sudoku_grid
@@ -154,11 +155,14 @@ class SudokuApp(App):
         sudoku_grid[0].add_class("selected")
         self.message.update("'1-9' insert, 'x' delete")
 
+    def action_load_file(self) -> None:
+        self.push_screen(SudokuFile(self.sudoku))
+
 
 def main():
     app = SudokuApp()
-    app.run()
-    return True
+    exit_code = app.run()
+    sys.exit(exit_code if exit_code is not None else 0)
 
 
 if __name__ == "__main__":
